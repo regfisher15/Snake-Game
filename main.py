@@ -57,15 +57,32 @@ def next_turn(snake, food):
 
     snake.squares.insert(0, square)
 
+    if x == food.coordinates[0] and y == food.coordinates[1]:
+
+        global score
+
+        score += 1
+
+        label.config(text="Score:{}".format(score))
+
+        canvas.delete('food')
+
+        food = Food()
+
     #delete last body part of snake
-    del snake.coordinates[-1]
+    else:
+        del snake.coordinates[-1]
 
-    canvas.delete(snake.squares[-1])
+        canvas.delete(snake.squares[-1])
 
-    del snake.squares[-1]
+        del snake.squares[-1]
 
-    #update snake
-    window.after(SPEED, next_turn, snake, food)
+    if check_collision(snake):
+        game_over()
+
+    else: 
+        #update snake
+        window.after(SPEED, next_turn, snake, food)
 
 def change_direction(new_direction):
     global direction
@@ -73,7 +90,7 @@ def change_direction(new_direction):
     #ensure new direction won't do a 180 turn 
     if new_direction == 'left':
         if direction != 'right':
-            direction = new_diretion
+            direction = new_direction
 
     elif new_direction == 'right':
         if direction != 'left':
@@ -87,8 +104,12 @@ def change_direction(new_direction):
         if direction != 'up':
             direction = new_direction
 
-def check_collision():
-    pass
+def check_collision(snake):
+    x, y = snake.coordinates[0]
+
+    if x < 0 or x >= GAME_WIDTH:
+        print("GAME OVER")
+        return True
 
 def game_over():
     pass
@@ -118,7 +139,7 @@ y = int((screen_height/2) - (window_height/2))
 
 window.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
-#bind arrow keys to change snake direction
+# bind arrow keys to change snake direction
 window.bind('<Left>', lambda event: change_direction('left'))
 window.bind('<Right>', lambda event: change_direction('right'))
 window.bind('<Up>', lambda event: change_direction('up'))
